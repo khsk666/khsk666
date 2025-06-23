@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>靠活烧烤点餐系统</title>
+    <!-- 替换为国内CDN -->
+    <link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            -webkit-tap-highlight-color: transparent; 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+        }
+        :root { 
+            --primary: #FF6B6B; 
+            --secondary: #4ECDC4; 
+            --dark: #1A1A2E; 
+            --light: #F8F9FA; 
+            --warning: #FF9F43;
+        }
+        body { 
+            background: linear-gradient(135deg, #1a2a3a, #2c3e50); 
+            color: #fff; 
+            min-height: 100vh; 
+            padding: 0; 
+            overflow-x: hidden; 
+            touch-action: manipulation; 
+            padding-bottom: env(safe-area-inset-bottom); 
+        }
+        .container { 
+            max-width: 100%; 
+            margin: 0 auto; 
+            background: rgba(30, 40, 50, 0.95); 
+            min-height: 100vh; 
+            position: relative; 
+        }
+        header { 
+            background: linear-gradient(90deg, var(--primary), var(--warning)); 
+            padding: 20px 15px; 
+            text-align: center; 
+            border-bottom-left-radius: 20px; 
+            border-bottom-right-radius: 20px; 
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); 
+            margin-bottom: 20px; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .logo { 
+            display: flex; 
+            flex-direction: column;
+            align-items: center; 
+            justify-content: center; 
+            margin-bottom: 10px; 
+        }
+        h1 { 
+            font-size: 32px; 
+            font-weight: 800; 
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3); 
+            margin-bottom: 5px; 
+            letter-spacing: 1px;
+        }
+        .subtitle { 
+            font-size: 14px; 
+            opacity: 0.9; 
+            font-weight: 500; 
+            margin-top: 5px;
+            padding: 5px 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            display: inline-block;
+        }
+        .tabs { 
+            display: flex; 
+            background: rgba(0, 0, 0, 0.2); 
+            border-radius: 50px; 
+            margin: 20px 15px 15px; 
+            overflow: hidden;
+            width: 100%;
+            max-width: 500px;
+        }
+        .tab { 
+            flex: 1; 
+            text-align: center; 
+            padding: 14px 0; 
+            font-weight: 600; 
+            cursor: pointer; 
+            transition: all 0.3s; 
+            font-size: 16px; 
+        }
+        .tab.active { 
+            background: white; 
+            color: var(--primary); 
+            border-radius: 50px; 
+        }
+        .content { 
+            padding: 0 15px 80px; 
+        }
+        .page { 
+            display: none; 
+        }
+        .page.active { 
+            display: block; 
+            animation: fadeIn 0.4s ease; 
+        }
+        @keyframes fadeIn { 
+            from { opacity: 0; transform: translateY(15px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
+        .input-group { 
+            margin-bottom: 20px; 
+            background: rgba(255, 255, 255, 0.08); 
+            border-radius: 16px; 
+            padding: 18px; 
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); 
+        }
+        label { 
+            display: block; 
+            margin-bottom: 10px; 
+            font-size: 17px; 
+            font-weight: 500; 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+        }
+        label i { 
+            width: 28px; 
+            height: 28px; 
+            background: rgba(255, 255, 255, 0.1); 
+            border-radius: 8px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+        }
+        input, select { 
+            width: 100%; 
+            padding: 16px; 
+            background: rgba(255, 255, 255, 0.1); 
+            border: 1px solid rgba(255, 255, 255, 0.15); 
+            border-radius: 14px; 
+            color: white; 
+            font-size: 18px; 
+            font-weight: 500; 
+            -webkit-appearance: none; 
+        }
+        input:focus, select:focus { 
+            outline: none; 
+            border-color: var(--primary); 
+            background: rgba(255, 255, 255, 0.15); 
+        }
+        .items-container { 
+            margin: 20px 0; 
+        }
+        .item-row { 
+            display: flex; 
+            gap: 10px; 
+            margin-bottom: 12px; 
+            align-items: center; 
+            background: rgba(255, 255, 255, 0.05); 
+            padding: 14px; 
+            border-radius: 14px; 
+        }
+        .item-row select { 
+            flex: 2; 
+            font-size: 16px; 
+            padding: 14px; 
+        }
+        .item-row input { 
+            flex: 1; 
+            text-align: center; 
+            font-size: 18px; 
+            padding: 14px 10px; 
+        }
+        .flavor-select { 
+            flex: 1.5; 
+            min-width: 100px; 
+        }
+        .btn-quick-add { 
+            background: rgba(41, 128, 185, 0.5); 
+            color: white; 
+            border: none; 
+            border-radius: 10px; 
+            width: 40px; 
+            height: 40px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 18px; 
+            cursor: pointer; 
+        }
+        .btn { 
+            display: block; 
+            width: 100%; 
+            padding: 18px; 
+            background: linear-gradient(90deg, var(--primary), var(--warning)); 
+            color: white; 
+            border: none; 
+            border-radius: 16px; 
+            font-size: 18px; 
+            font-weight: 700; 
+            cursor: pointer; 
+            margin-top: 12px; 
+            transition: all 0.2s; 
+            box-shadow: 0 6px 15px rgba(255, 107, 107, 0.35); 
+        }
+        .btn:active { 
+            transform: translateY(2px); 
+            box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3); 
+        }
+        .btn i { 
+            margin-right: 8px; 
+        }
+        .btn-add { 
+            background: rgba(76, 175, 80, 0.85); 
+            box-shadow: 0 6px 15px rgba(76, 175, 80, 0.35); 
+        }
+        .btn-export { 
+            background: rgba(41, 128, 185, 0.85); 
+            box-shadow: 0 6px 15px rgba(41, 128, 185, 0.35); 
+        }
+        .btn-remove { 
+            background: rgba(231, 76, 60, 0.85); 
+            width: 48px; 
+            height: 48px; 
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 22px; 
+            box-shadow: 0 4px 10px rgba(231, 76, 60, 0.3); 
+        }
+        .order-total { 
+            background: rgba(255, 255, 255, 0.1); 
+            padding: 18px; 
+            border-radius: 16px; 
+            font-size: 22px; 
+            text-align: center; 
+            margin: 25px 0; 
+            font-weight: 700; 
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); 
+        }
+        .orders-list { 
+            max-height: 60vh; 
+            overflow-y: auto; 
+            padding-right: 5px; 
+            margin-bottom: 20px; 
+        }
+        .order-card { 
+            background: rgba(255, 255, 255, 0.05); 
+            border-radius: 18px; 
+            padding: 20px; 
+            margin-bottom: 18px; 
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); 
+            position: relative; 
+        }
+        .order-header { 
+            display: flex; 
+            justify-content: space-between; 
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1); 
+            padding-bottom: 14px; 
+            margin-bottom: 14px; 
+        }
+        .order-id { 
+            color: var(--primary); 
+            font-weight: 700; 
+            font-size: 18px; 
+        }
+        .order-time { 
+            font-size: 16px; 
+            opacity: 0.7; 
+            font-weight: 500; 
+        }
+        .order-table { 
+            font-weight: 700; 
+            margin-bottom: 14px; 
+            font-size: 17px; 
+        }
+        .order-item { 
+            display: flex; 
+            justify-content: space-between; 
+            padding: 8px 0; 
+            font-size: 17px; 
+        }
+        .order-notes { 
+            margin-top: 14px; 
+            padding-top: 14px; 
+            border-top: 1px dashed rgba(255, 255, 255, 0.1); 
+            opacity: 0.85; 
+            font-size: 16px; 
+            font-style: italic; 
+        }
+        .stats-grid { 
+            display: grid; 
+            grid-template-columns: repeat(2, 1fr); 
+            gap: 18px; 
+            margin: 20px 0; 
+        }
+        .stat-card { 
+            background: rgba(255, 255, 255, 0.05); 
+            border-radius: 18px; 
+            padding: 20px; 
+            text-align: center; 
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); 
+        }
+        .stat-value { 
+            font-size: 32px; 
+            font-weight: 800; 
+            color: var(--primary); 
+            margin: 12px 0; 
+        }
+        .stat-label { 
+            font-size: 16px; 
+            opacity: 0.8; 
+            font-weight: 500; 
+        }
+        .popular-items { 
+            background: rgba(255, 255, 255, 0.05); 
+            border-radius: 18px; 
+            padding: 20px; 
+            margin-top: 20px; 
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); 
+        }
+        .popular-item { 
+            display: flex; 
+            justify-content: space-between; 
+            padding: 12px 0; 
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1); 
+            font-size: 17px; 
+        }
+        .popular-details { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: flex-end; 
+        }
+        .popular-count { 
+            font-size: 15px; 
+            opacity: 0.8; 
+        }
+        .popular-amount { 
+            font-weight: bold; 
+            color: var(--secondary); 
+        }
+        .btn-delete-order { 
+            position: absolute; 
+            top: 20px; 
+            right: 20px; 
+            background: rgba(231, 76, 60, 0.2); 
+            border: none; 
+            color: rgba(231, 76, 60, 0.8); 
+            border-radius: 50%; 
+            width: 30px; 
+            height: 30px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            cursor: pointer; 
+        }
+        .footer { 
+            text-align: center; 
+            padding: 20px; 
+            font-size: 15px; 
+            opacity: 0.7; 
+            padding-bottom: calc(20px + env(safe-area-inset-bottom)); 
+        }
+        .home-indicator { 
+            height: 34px; 
+            display: flex; 
+            justify-content: center; 
+            position: relative; 
+        }
+        .indicator { 
+            width: 140px; 
+            height: 5px; 
+            background: rgba(255, 255, 255, 0.4); 
+            border-radius: 5px; 
+            position: absolute; 
+            bottom: 8px; 
+        }
+        @media (max-width: 380px) { 
+            .item-row { 
+                flex-wrap: wrap; 
+            } 
+            .item-row select { 
+                flex: 100%; 
+            } 
+            .item-row input { 
+                flex: 1; 
+            } 
+            .flavor-select { 
+                flex: 100%; 
+                margin-top: 10px; 
+            }
+            .btn-remove { 
+                flex: 0 0 48px; 
+            } 
+            h1 { 
+                font-size: 24px; 
+            } 
+            .order-total { 
+                font-size: 20px; 
+                padding: 14px; 
+            } 
+            .btn-quick-add { 
+                width: 35px; 
+                height: 35px; 
+            }
+        }
+        ::-webkit-scrollbar { 
+            width: 6px; 
+        } 
+        ::-webkit-scrollbar-track { 
+            background: rgba(0, 0, 0, 0.1); 
+            border-radius: 10px; 
+        } 
+        ::-webkit-scrollbar-thumb { 
+            background: var(--primary); 
+            border-radius: 10px; 
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <h1>靠活烧烤</h1>
+                <div class="subtitle">纯炭火烤制，需要点时间，请您耐心等待！</div>
+            </div>
+            
+            <div class="tabs" id="tabs-container">
+                <div class="tab active" data-page="order">点单</div>
+                <div class="tab" data-page="orders">订单</div>
+                <div class="tab" data-page="stats">统计</div>
+            </div>
+        </header>
+        
+        <div class="content">
+            <div class="page active" id="order-page">
+                <div class="input-group">
+                    <label for="table-number"><i class="fas fa-table"></i> 桌号/编号</label>
+                    <input type="text" id="table-number" placeholder="例如: A1, 打包01">
+                </div>
+                
+                <div class="input-group">
+                    <label><i class="fas fa-list"></i> 菜品清单</label>
+                    <div class="items-container" id="items-container">
+                        <div class="item-row">
+                            <select class="item-select">
+                                <option value="">选择菜品</option>
+                                <option value="湿辣牛肉串" data-price="2">湿辣牛肉串 (¥2.00)</option>
+                                <option value="孜然牛肉串" data-price="2">孜然牛肉串 (¥2.00)</option>
+                                <option value="五花肉串" data-price="2.5">五花肉串 (¥2.50)</option>
+                                <option value="猪颈肉串" data-price="2">猪颈肉串 (¥2.00)</option>
+                                <option value="鸡翅" data-price="8">鸡翅 (¥8.00)</option>
+                                <option value="蒜苔串" data-price="1.5">蒜苔串 (¥1.50)</option>
+                                <option value="娃娃菜串" data-price="2">娃娃菜串 (¥2.00)</option>
+                                <option value="香菇串" data-price="2">香菇串 (¥2.00)</option>
+                                <option value="韭黄牛肉串" data-price="4">韭黄牛肉串 (¥4.00)</option>
+                                <option value="金针菇牛肉串" data-price="4">金针菇牛肉串 (¥4.00)</option>
+                            </select>
+                            <button class="btn-quick-add">+</button>
+                            <input type="number" class="quantity" min="1" value="1" placeholder="数量">
+                            <select class="flavor-select">
+                                <option value="默认">默认</option>
+                                <option value="微辣">微辣</option>
+                                <option value="中辣">中辣</option>
+                                <option value="特辣">特辣</option>
+                                <option value="免辣">免辣</option>
+                            </select>
+                            <button class="btn btn-remove"><i class="fas fa-times"></i></button>
+                        </div>
+                    </div>
+                    <button id="add-item" class="btn btn-add"><i class="fas fa-plus"></i> 添加菜品</button>
+                </div>
+                
+                <div class="input-group">
+                    <label for="notes"><i class="fas fa-sticky-note"></i> 备注要求</label>
+                    <input type="text" id="notes" placeholder="例如: 打包、在这吃">
+                </div>
+                
+                <div class="order-total" id="order-total">订单总额: ¥0.00</div>
+                
+                <button id="add-order" class="btn"><i class="fas fa-check"></i> 提交订单</button>
+            </div>
+            
+            <div class="page" id="orders-page">
+                <h2 style="margin-bottom: 20px; font-size: 24px;"><i class="fas fa-history"></i> 历史订单</h2>
+                
+                <div class="orders-list" id="orders-list">
+                    <div style="text-align: center; padding: 40px 20px; opacity: 0.7; border-radius: 18px; background: rgba(255,255,255,0.05);">
+                        <i class="fas fa-inbox" style="font-size: 48px; margin-bottom: 20px; opacity: 0.5;"></i>
+                        <p style="font-size: 18px;">暂无订单记录</p>
+                        <p style="margin-top: 10px; font-size: 15px;">切换到"点单"页面添加订单</p>
+                    </div>
+                </div>
+                
+                <button id="export-excel" class="btn btn-export"><i class="fas fa-file-excel"></i> 导出Excel数据</button>
+                <button id="clear-data" class="btn" style="background: rgba(120, 120, 120, 0.8); margin-top: 15px;"><i class="fas fa-trash"></i> 清除所有数据</button>
+            </div>
+            
+            <div class="page" id="stats-page">
+                <h2 style="margin-bottom: 20px; font-size: 24px;"><i class="fas fa-chart-bar"></i> 销售统计</h2>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">今日订单</div>
+                        <div class="stat-value" id="order-count">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">今日销售额</div>
+                        <div class="stat-value" id="sales-total">¥0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">总订单数</div>
+                        <div class="stat-value" id="total-orders">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">总销售额</div>
+                        <div class="stat-value" id="total-sales">¥0</div>
+                    </div>
+                </div>
+                
+                <div class="popular-items">
+                    <h3 style="margin-bottom: 20px; font-size: 20px;"><i class="fas fa-fire"></i> 最受欢迎菜品</h3>
+                    <div id="popular-items-list">
+                        <div style="text-align: center; padding: 20px; opacity: 0.7; border-radius: 14px; background: rgba(255,255,255,0.05);">
+                            <i class="fas fa-utensils" style="font-size: 24px; margin-bottom: 10px;"></i>
+                            <p>暂无数据</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            梦藏于心-行大于辩
+        </div>
+        
+        <div class="home-indicator">
+            <div class="indicator"></div>
+        </div>
+    </div>
+
+    <script>
+        // 初始化数据
+        let orders = JSON.parse(localStorage.getItem('bbqOrders')) || [];
+        
+        // DOM元素
+        const itemsContainer = document.getElementById('items-container');
+        const addItemBtn = document.getElementById('add-item');
+        const addOrderBtn = document.getElementById('add-order');
+        const exportBtn = document.getElementById('export-excel');
+        const clearBtn = document.getElementById('clear-data');
+        const ordersList = document.getElementById('orders-list');
+        const orderTotalEl = document.getElementById('order-total');
+        const orderCountEl = document.getElementById('order-count');
+        const salesTotalEl = document.getElementById('sales-total');
+        const totalOrdersEl = document.getElementById('total-orders');
+        const totalSalesEl = document.getElementById('total-sales');
+        const popularItemsList = document.getElementById('popular-items-list');
+        
+        // 标签切换逻辑
+        const tabs = document.querySelectorAll('.tab');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // 移除所有标签的活动状态
+                tabs.forEach(t => t.classList.remove('active'));
+                // 添加当前标签的活动状态
+                tab.classList.add('active');
+                
+                // 隐藏所有页面
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                // 显示当前页面
+                const pageId = tab.getAttribute('data-page');
+                document.getElementById(`${pageId}-page`).classList.add('active');
+                
+                // 更新统计页面
+                if (pageId === 'stats') {
+                    updateStats();
+                } else if (pageId === 'orders') {
+                    renderOrders();
+                }
+            });
+        });
+        
+        // 添加新菜品行
+        addItemBtn.addEventListener('click', () => {
+            const newItemRow = document.createElement('div');
+            newItemRow.className = 'item-row';
+            newItemRow.innerHTML = `
+                <select class="item-select">
+                    <option value="">选择菜品</option>
+                    <option value="湿辣牛肉串" data-price="2">湿辣牛肉串 (¥2.00)</option>
+                    <option value="孜然牛肉串" data-price="2">孜然牛肉串 (¥2.00)</option>
+                    <option value="五花肉串" data-price="2.5">五花肉串 (¥2.50)</option>
+                    <option value="猪颈肉串" data-price="2">猪颈肉串 (¥2.00)</option>
+                    <option value="鸡翅" data-price="8">鸡翅 (¥8.00)</option>
+                    <option value="蒜苔串" data-price="1.5">蒜苔串 (¥1.50)</option>
+                    <option value="娃娃菜串" data-price="2">娃娃菜串 (¥2.00)</option>
+                    <option value="香菇串" data-price="2">香菇串 (¥2.00)</option>
+                    <option value="韭黄牛肉串" data-price="4">韭黄牛肉串 (¥4.00)</option>
+                    <option value="金针菇牛肉串" data-price="4">金针菇牛肉串 (¥4.00)</option>
+                </select>
+                <button class="btn-quick-add">+</button>
+                <input type="number" class="quantity" min="1" value="1" placeholder="数量">
+                <select class="flavor-select">
+                    <option value="默认">默认</option>
+                    <option value="微辣">微辣</option>
+                    <option value="中辣">中辣</option>
+                    <option value="特辣">特辣</option>
+                    <option value="免辣">免辣</option>
+                </select>
+                <button class="btn btn-remove"><i class="fas fa-times"></i></button>
+            `;
+            
+            // 添加快速添加按钮事件
+            const quickAddBtn = newItemRow.querySelector('.btn-quick-add');
+            quickAddBtn.addEventListener('click', () => {
+                addItemRow(newItemRow);
+            });
+            
+            // 添加删除按钮事件
+            const removeBtn = newItemRow.querySelector('.btn-remove');
+            removeBtn.addEventListener('click', () => {
+                newItemRow.remove();
+                updateTotal();
+            });
+            
+            // 添加菜品选择事件
+            const itemSelect = newItemRow.querySelector('.item-select');
+            itemSelect.addEventListener('change', () => {
+                updateTotal();
+            });
+            
+            // 添加数量变化事件
+            const quantityInput = newItemRow.querySelector('.quantity');
+            quantityInput.addEventListener('input', () => {
+                updateTotal();
+            });
+            
+            // 将新行添加到容器中
+            itemsContainer.appendChild(newItemRow);
+            
+            // 聚焦到新添加的选择框
+            itemSelect.focus();
+            
+            // 更新总价
+            updateTotal();
+        });
+        
+        // 快速添加一行
+        function addItemRow(row) {
+            const newRow = row.cloneNode(true);
+            
+            // 重置选择和数量
+            const itemSelect = newRow.querySelector('.item-select');
+            itemSelect.selectedIndex = 0;
+            
+            const quantityInput = newRow.querySelector('.quantity');
+            quantityInput.value = 1;
+            
+            // 重新绑定事件
+            const quickAddBtn = newRow.querySelector('.btn-quick-add');
+            quickAddBtn.addEventListener('click', () => {
+                addItemRow(newRow);
+            });
+            
+            const removeBtn = newRow.querySelector('.btn-remove');
+            removeBtn.addEventListener('click', () => {
+                newRow.remove();
+                updateTotal();
+            });
+            
+            itemSelect.addEventListener('change', () => {
+                updateTotal();
+            });
+            
+            quantityInput.addEventListener('input', () => {
+                updateTotal();
+            });
+            
+            // 将新行添加到容器中
+            itemsContainer.appendChild(newRow);
+            
+            // 聚焦到新添加的选择框
+            itemSelect.focus();
+            
+            // 更新总价
+            updateTotal();
+        }
+        
+        // 更新订单总价
+        function updateTotal() {
+            let total = 0;
+            const itemRows = document.querySelectorAll('.item-row');
+            
+            itemRows.forEach(row => {
+                const itemSelect = row.querySelector('.item-select');
+                const quantityInput = row.querySelector('.quantity');
+                
+                if (itemSelect.value && quantityInput.value) {
+                    const price = parseFloat(itemSelect.options[itemSelect.selectedIndex].getAttribute('data-price'));
+                    const quantity = parseInt(quantityInput.value) || 0;
+                    total += price * quantity;
+                }
+            });
+            
+            orderTotalEl.textContent = `订单总额: ¥${total.toFixed(2)}`;
+        }
+        
+        // 初始化第一个菜品行的事件
+        const firstItemRow = document.querySelector('.item-row');
+        const firstItemSelect = firstItemRow.querySelector('.item-select');
+        const firstQuantityInput = firstItemRow.querySelector('.quantity');
+        const firstQuickAddBtn = firstItemRow.querySelector('.btn-quick-add');
+        const firstRemoveBtn = firstItemRow.querySelector('.btn-remove');
+        
+        firstItemSelect.addEventListener('change', updateTotal);
+        firstQuantityInput.addEventListener('input', updateTotal);
+        
+        firstQuickAddBtn.addEventListener('click', () => {
+            addItemBtn.click();
+        });
+        
+        firstRemoveBtn.addEventListener('click', () => {
+            if (document.querySelectorAll('.item-row').length > 1) {
+                firstItemRow.remove();
+                updateTotal();
+            } else {
+                // 至少保留一行
+                firstItemSelect.selectedIndex = 0;
+                firstQuantityInput.value = 1;
+                updateTotal();
+            }
+        });
+        
+        // 添加订单
+        addOrderBtn.addEventListener('click', () => {
+            const tableNumber = document.getElementById('table-number').value.trim();
+            const notes = document.getElementById('notes').value.trim();
+            const itemRows = document.querySelectorAll('.item-row');
+            
+            if (!tableNumber) {
+                alert('请输入桌号/编号');
+                return;
+            }
+            
+            let hasItems = false;
+            const orderItems = [];
+            
+            itemRows.forEach(row => {
+                const itemSelect = row.querySelector('.item-select');
+                const quantityInput = row.querySelector('.quantity');
+                const flavorSelect = row.querySelector('.flavor-select');
+                
+                if (itemSelect.value && quantityInput.value && parseInt(quantityInput.value) > 0) {
+                    hasItems = true;
+                    const itemName = itemSelect.value;
+                    const itemPrice = parseFloat(itemSelect.options[itemSelect.selectedIndex].getAttribute('data-price'));
+                    const itemQuantity = parseInt(quantityInput.value);
+                    const itemFlavor = flavorSelect.value;
+                    const itemSubtotal = itemPrice * itemQuantity;
+                    
+                    orderItems.append({
+                        name: itemName,
+                        price: itemPrice,
+                        quantity: itemQuantity,
+                        flavor: itemFlavor,
+                        subtotal: itemSubtotal
+                    });
+                }
+            });
+            
+            if (!hasItems) {
+                alert('请至少选择一项菜品');
+                return;
+            }
+            
+            // 创建订单对象
+            const order = {
+                id: `#${Date.now().toString().slice(-6)}`,
+                tableNumber: tableNumber,
+                items: orderItems,
+                totalPrice: orderItems.reduce((sum, item) => sum + item.subtotal, 0),
+                notes: notes,
+                timestamp: new Date().toLocaleString()
+            };
+            
+            // 添加到订单列表
+            orders.unbind(order);
+            
+            // 保存到localStorage
+            localStorage.setItem('bbqOrders', JSON.stringify(orders));
+            
+            // 清空表单
+            document.getElementById('table-number').value = '';
+            document.getElementById('notes').value = '';
+            
+            // 只保留一个空的菜品行
+            while (itemsContainer.firstChild) {
+                itemsContainer.removeChild(itemsContainer.firstChild);
+            }
+            addItemBtn.click();
+            
+            // 显示成功消息
+            alert(`订单 ${order.id} 已提交！`);
+            
+            // 如果当前在订单页面，更新订单列表
+            if (document.getElementById('orders-page').classList.contains('active')) {
+                renderOrders();
+            }
+            
+            // 如果当前在统计页面，更新统计数据
+            if (document.getElementById('stats-page').classList.contains('active')) {
+                updateStats();
+            }
+        });
+        
+        // 渲染订单列表
+        function renderOrders() {
+            if (orders.length === 0) {
+                ordersList.innerHTML = `
+                    <div style="text-align: center; padding: 40px 20px; opacity: 0.7; border-radius: 18px; background: rgba(255,255,255,0.05);">
+                        <i class="fas fa-inbox" style="font-size: 48px; margin-bottom: 20px; opacity: 0.5;"></i>
+                        <p style="font-size: 18px;">暂无订单记录</p>
+                        <p style="margin-top: 10px; font-size: 15px;">切换到"点单"页面添加订单</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            ordersList.innerHTML = '';
+            
+            orders.forEach(order => {
+                const orderCard = document.createElement('div');
+                orderCard.className = 'order-card';
+                orderCard.innerHTML = `
+                    <div class="order-header">
+                        <div class="order-id">${order.id}</div>
+                        <div class="order-time">${order.timestamp}</div>
+                    </div>
+                    <div class="order-table">桌号: ${order.tableNumber}</div>
+                    <div class="order-items">
+                        ${order.items.map(item => `
+                            <div class="order-item">
+                                <div>${item.name} × ${item.quantity}${item.flavor !== '默认' ? ` (${item.flavor})` : ''}</div>
+                                <div>¥${item.subtotal.toFixed(2)}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="order-total" style="margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(255, 255, 255, 0.1); font-weight: 700;">
+                        总计: ¥${order.totalPrice.toFixed(2)}
+                    </div>
+                    ${order.notes ? `<div class="order-notes">备注: ${order.notes}</div>` : ''}
+                    <button class="btn-delete-order" data-id="${order.id}">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                `;
+                
+                ordersList.appendChild(orderCard);
+                
+                // 添加删除按钮事件
+                const deleteBtn = orderCard.querySelector('.btn-delete-order');
+                deleteBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const orderId = e.currentTarget.getAttribute('data-id');
+                    if (confirm(`确定要删除订单 ${orderId} 吗？`)) {
+                        orders = orders.filter(o => o.id !== orderId);
+                        localStorage.setItem('bbqOrders', JSON.stringify(orders));
+                        renderOrders();
+                        updateStats();
+                    }
+                });
+            });
+        }
+        
+        // 更新统计数据
+        function updateStats() {
+            if (orders.length === 0) {
+                orderCountEl.textContent = '0';
+                salesTotalEl.textContent = '¥0';
+                totalOrdersEl.textContent = '0';
+                totalSalesEl.textContent = '¥0';
+                popularItemsList.innerHTML = `
+                    <div style="text-align: center; padding: 20px; opacity: 0.7; border-radius: 14px; background: rgba(255,255,255,0.05);">
+                        <i class="fas fa-utensils" style="font-size: 24px; margin-bottom: 10px;"></i>
+                        <p>暂无数据</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // 计算今日订单和销售额
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const todayTimestamp = today.getTime();
+            
+            const todayOrders = orders.filter(order => {
+                const orderDate = new Date(order.timestamp);
+                return orderDate >= today;
+            });
+            
+            const todayOrderCount = todayOrders.length;
+            const todaySales = todayOrders.reduce((sum, order) => sum + order.totalPrice, 0);
+            
+            // 计算总订单和总销售额
+            const totalOrderCount = orders.length;
+            const totalSales = orders.reduce((sum, order) => sum + order.totalPrice, 0);
+            
+            // 更新统计UI
+            orderCountEl.textContent = todayOrderCount;
+            salesTotalEl.textContent = `¥${todaySales.toFixed(2)}`;
+            totalOrdersEl.textContent = totalOrderCount;
+            totalSalesEl.textContent = `¥${totalSales.toFixed(2)}`;
+            
+            // 分析热门菜品
+            const itemMap = {};
+            
+            orders.forEach(order => {
+                order.items.forEach(item => {
+                    if (!itemMap[item.name]) {
+                        itemMap[item.name] = {
+                            name: item.name,
+                            count: 0,
+                            totalPrice: 0
+                        };
+                    }
+                    itemMap[item.name].count += item.quantity;
+                    itemMap[item.name].totalPrice += item.subtotal;
+                });
+            });
+            
+            // 转换为数组并排序
+            const popularItems = Object.values(itemMap)
+                .sort((a, b) => b.count - a.count)
+                .slice(0, 5);
+            
+            // 更新热门菜品UI
+            if (popularItems.length > 0) {
+                popularItemsList.innerHTML = popularItems.map(item => `
+                    <div class="popular-item">
+                        <div>${item.name}</div>
+                        <div class="popular-details">
+                            <div class="popular-amount">¥${item.totalPrice.toFixed(2)}</div>
+                            <div class="popular-count">销量: ${item.count}</div>
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                popularItemsList.innerHTML = `
+                    <div style="text-align: center; padding: 20px; opacity: 0.7; border-radius: 14px; background: rgba(255,255,255,0.05);">
+                        <i class="fas fa-utensils" style="font-size: 24px; margin-bottom: 10px;"></i>
+                        <p>暂无数据</p>
+                    </div>
+                `;
+            }
+        }
+        
+        // 导出Excel数据
+        exportBtn.addEventListener('click', () => {
+            if (orders.length === 0) {
+                alert('没有订单数据可导出');
+                return;
+            }
+            
+            // 创建CSV内容
+            let csvContent = "订单ID,桌号,菜品,数量,口味,单价,小计,备注,时间\n";
+            
+            orders.forEach(order => {
+                order.items.forEach(item => {
+                    csvContent += `${order.id},${order.tableNumber},"${item.name}",${item.quantity},${item.flavor},${item.price},${item.subtotal},"${order.notes || ''}",${order.timestamp}\n`;
+                });
+            });
+            
+            // 创建并下载CSV文件
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            
+            link.setAttribute('href', url);
+            link.setAttribute('download', `烧烤订单数据_${new Date().toLocaleDateString()}.csv`);
+            link.style.visibility = 'hidden';
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+        
+        // 清除所有数据
+        clearBtn.addEventListener('click', () => {
+            if (confirm('确定要清除所有订单数据吗？此操作不可恢复！')) {
+                orders = [];
+                localStorage.removeItem('bbqOrders');
+                renderOrders();
+                updateStats();
+                alert('所有订单数据已清除！');
+            }
+        });
+        
+        // 初始化页面
+        renderOrders();
+        updateStats();
+    </script>
+</body>
+</html>
